@@ -306,7 +306,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .corridor-btn:active { transform: scale(.96); }
 @media (hover: hover) and (pointer: fine) { .corridor-btn:hover { background: var(--ink); color: #fff; border-color: var(--ink); } }
 .corridor { --corridor-pad: var(--gutter);
-  overflow-x: auto; scroll-snap-type: x proximity; scroll-padding-inline: var(--corridor-pad); scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  overflow-x: auto; overflow-y: visible; scroll-snap-type: x proximity; scroll-padding-inline: var(--corridor-pad); scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  padding-top: 6px; margin-top: -6px;
   mask-image: linear-gradient(to right, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%); }
 .corridor::-webkit-scrollbar { display: none; }
 .corridor-track { display: flex; gap: var(--gap-m); padding-inline: var(--corridor-pad); }
