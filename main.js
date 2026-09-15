@@ -8,6 +8,23 @@
   var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var still = function () { return rm || QA || html.classList.contains('a11y-still'); };
 
+  /* ---------- preloader: hides on real window load, no artificial wait ---------- */
+  (function preloader() {
+    var pre = document.getElementById('preloader');
+    if (!pre) return;
+    if (rm || QA) { pre.remove(); return; }
+    if (params.get('preloader') === 'hold') return; // QA hook: freeze the preloader visible
+    var hidden = false;
+    function hide() {
+      if (hidden) return; hidden = true;
+      pre.classList.add('is-hidden');
+      setTimeout(function () { pre.remove(); }, 520);
+    }
+    if (document.readyState === 'complete') hide();
+    else window.addEventListener('load', hide);
+    setTimeout(hide, 4000);
+  })();
+
   /* ---------- header ---------- */
   var header = document.getElementById('siteHeader');
   var hero = document.getElementById('hero');
