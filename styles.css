@@ -1,7 +1,8 @@
 /* El-Mor Renewable Energy · skin: storeos-quiet (editorial minimalism) · frame: fluid (full-bleed + clamp)
-   Font: Clash Display for everything (600 headings factor 1.03 · 400 text factor 1.08 · λ 0.88) */
+   Fonts: Clash Display for headings/numbers (600, factor 1.03) · Clash Grotesk for running text (400/500, factor 1.12), λ 0.878 for both.
+   Display swapped for Grotesk on body text 15.9.2026: Liav flagged Display as unsuited to paragraphs; Grotesk is ITF's text-optimized sibling. */
 
-/* Clash Display is loaded from the Fontshare API (ITF FFL: no redistribution via repositories, no subsetting) */
+/* Both fonts load from the Fontshare API (ITF FFL: no redistribution via repositories, no subsetting) */
 
 :root {
   --a11y-scale: 1;
@@ -33,21 +34,21 @@
   --shadow-lift: 0 18px 50px rgba(6,12,24,.18);
 
   --font-display: 'Clash Display', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
-  --font-text: 'Clash Display', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+  --font-text: 'Clash Grotesk', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
 
   /* fluid scale: clamp(min x F, slope x F vw + zoom-rem, max x F)
-     Clash 600 factor 1.03 (headings, stats) · Clash 400 factor 1.08 (text) */
+     Clash Display 600 factor 1.03 (headings, stats) · Clash Grotesk 400/500 factor 1.12 (text) */
   --fs-hero: calc(clamp(45px, 5.15vw + 0.5rem, 122px) * var(--a11y-scale));
   --fs-h1: calc(clamp(40px, 3.7vw + 0.45rem, 96px) * var(--a11y-scale));
   --fs-h2: calc(clamp(33px, 2.68vw + 0.4rem, 74px) * var(--a11y-scale));
   --fs-h3: calc(clamp(21px, 1.24vw + 0.5rem, 35px) * var(--a11y-scale));
-  --fs-lead: calc(clamp(20px, 1.08vw + 0.6rem, 32px) * var(--a11y-scale));
-  --fs-body: calc(clamp(17px, 0.59vw + 0.7rem, 24px) * var(--a11y-scale));
-  --fs-meta: calc(clamp(14px, 0.59vw + 0.49rem, 19px) * var(--a11y-scale));
-  --fs-micro: calc(clamp(13px, 0.49vw + 0.49rem, 17px) * var(--a11y-scale));
+  --fs-lead: calc(clamp(21px, 1.12vw + 0.62rem, 34px) * var(--a11y-scale));
+  --fs-body: calc(clamp(18px, 0.62vw + 0.73rem, 25px) * var(--a11y-scale));
+  --fs-meta: calc(clamp(15px, 0.62vw + 0.5rem, 20px) * var(--a11y-scale));
+  --fs-micro: calc(clamp(13px, 0.5vw + 0.5rem, 18px) * var(--a11y-scale));
   --fs-stat: calc(clamp(46px, 4.2vw + 0.5rem, 104px) * var(--a11y-scale));
-  --fs-btn: calc(clamp(16px, 0.38vw + 0.81rem, 20px) * var(--a11y-scale));
-  --fs-nav: calc(clamp(15px, 0.32vw + 0.76rem, 18px) * var(--a11y-scale));
+  --fs-btn: calc(clamp(17px, 0.39vw + 0.84rem, 21px) * var(--a11y-scale));
+  --fs-nav: calc(clamp(16px, 0.36vw + 0.85rem, 19px) * var(--a11y-scale));
 
   /* fluid frame: no container, the section is the screen */
   --gutter: clamp(24px, 5vw, 96px);
