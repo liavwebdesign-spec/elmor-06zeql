@@ -9,16 +9,18 @@
   var still = function () { return rm || QA || html.classList.contains('a11y-still'); };
 
   /* ---------- preloader: hides on real window load, no artificial wait ---------- */
+  var preloaderDoneResolve;
+  var preloaderDone = new Promise(function (r) { preloaderDoneResolve = r; });
   (function preloader() {
     var pre = document.getElementById('preloader');
-    if (!pre) return;
-    if (rm || QA) { pre.remove(); return; }
+    if (!pre) { preloaderDoneResolve(); return; }
+    if (rm || QA) { pre.remove(); preloaderDoneResolve(); return; }
     if (params.get('preloader') === 'hold') return; // QA hook: freeze the preloader visible
     var hidden = false;
     function hide() {
       if (hidden) return; hidden = true;
       pre.classList.add('is-hidden');
-      setTimeout(function () { pre.remove(); }, 520);
+      setTimeout(function () { pre.remove(); preloaderDoneResolve(); }, 520);
     }
     if (document.readyState === 'complete') hide();
     else window.addEventListener('load', hide);
@@ -79,27 +81,13 @@
     reveals.forEach(function (el) { el.classList.add('is-in'); });
   }
 
-  /* ---------- count-up (B2) ---------- */
+  /* ---------- count-up: static final values here; the animated version lives in the GSAP layer ---------- */
   var counts = document.querySelectorAll('.count');
   function fmt(v, d) { return d ? v.toFixed(d) : Math.round(v).toLocaleString('en-US'); }
-  function runCount(el) {
-    var target = parseFloat(el.dataset.count), d = parseInt(el.dataset.decimals || '0', 10);
-    var start = performance.now(), dur = 900;
-    function step(t) {
-      var p = Math.min(1, (t - start) / dur), e = 1 - Math.pow(1 - p, 3);
-      el.textContent = fmt(target * e, d);
-      if (p < 1) requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
-  }
-  if (!still() && 'IntersectionObserver' in window) {
-    var cio = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) { if (en.isIntersecting) { runCount(en.target); cio.unobserve(en.target); } });
-    }, { threshold: 0.6 });
-    counts.forEach(function (el) { cio.observe(el); });
-  } else {
-    counts.forEach(function (el) { el.textContent = fmt(parseFloat(el.dataset.count), parseInt(el.dataset.decimals || '0', 10)); });
-  }
+  var countTarget = function (el) { return parseFloat(el.dataset.count); };
+  var countDec = function (el) { return parseInt(el.dataset.decimals || '0', 10); };
+  var gsapReady = !!(window.gsap && window.ScrollTrigger) && !still();
+  if (!gsapReady) counts.forEach(function (el) { el.textContent = fmt(countTarget(el), countDec(el)); });
 
   /* ---------- corridor arrows ---------- */
   var corridor = document.getElementById('corridor');
@@ -229,6 +217,26 @@
   }
 
   gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', function () {
+    // Stat counters: 2.2s like the old site, start once the band is visible and the preloader is gone
+    var statsBand = document.getElementById('stats');
+    if (statsBand && counts.length) {
+      counts.forEach(function (el) { el.textContent = fmt(0, countDec(el)); });
+      var fired = false;
+      var fire = function () {
+        if (fired) return; fired = true;
+        if (html.classList.contains('a11y-still')) { counts.forEach(function (el) { el.textContent = fmt(countTarget(el), countDec(el)); }); return; }
+        preloaderDone.then(function () {
+          counts.forEach(function (el, i) {
+            var o = { v: 0 }, d = countDec(el);
+            gsap.to(o, { v: countTarget(el), duration: 2.2, delay: 0.35 + i * 0.12, ease: 'power3.out',
+              onUpdate: function () { el.textContent = fmt(o.v, d); } });
+          });
+        });
+      };
+      ScrollTrigger.create({ trigger: statsBand, start: 'top 65%', onEnter: fire,
+        onRefresh: function (self) { if (self.progress > 0) fire(); } });
+    }
+
     // G13 · batch reveal for grids (bento tiles + project cards)
     gsap.set('.batch-card', { y: 24, opacity: 0 });
     ScrollTrigger.batch('.batch-card', {
