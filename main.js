@@ -198,7 +198,7 @@
     apply();
   })();
 
-  /* ---------- GSAP layer (approved: G13, G4ב, G12) ---------- */
+  /* ---------- GSAP layer (approved: G13, G4ב, G12 · round 2: G4א hero words, G2 tiles, G5 pillars, G18-lite closer) ---------- */
   if (!window.gsap || !window.ScrollTrigger || QA) {
     document.querySelectorAll('.batch-card').forEach(function (el) { el.style.opacity = 1; });
     return;
@@ -237,7 +237,58 @@
         onRefresh: function (self) { if (self.progress > 0) fire(); } });
     }
 
-    // G13 · batch reveal for grids (bento tiles + project cards)
+    var calm = html.classList.contains('a11y-still');
+
+    // G4א · hero title: words rise out of a mask once the preloader is gone
+    var heroTitle = document.querySelector('.hero-title');
+    if (heroTitle && !calm && !heroTitle.querySelector('.wi')) {
+      var heroText = heroTitle.textContent.trim();
+      var heroWords = heroText.split(/\s+/);
+      heroTitle.setAttribute('aria-label', heroText);
+      heroTitle.textContent = '';
+      var heroInner = heroWords.map(function (w, i) {
+        var outer = document.createElement('span'); outer.className = 'w'; outer.setAttribute('aria-hidden', 'true');
+        var inner = document.createElement('span'); inner.className = 'wi'; inner.textContent = w;
+        outer.appendChild(inner); heroTitle.appendChild(outer);
+        if (i < heroWords.length - 1) heroTitle.appendChild(document.createTextNode(' '));
+        return inner;
+      });
+      var heroEyebrow = document.querySelector('.hero-inner .eyebrow');
+      var heroRest = document.querySelectorAll('.hero-lead, .scroll-cue');
+      gsap.set(heroInner, { yPercent: 115 });
+      gsap.set([heroEyebrow].concat(Array.prototype.slice.call(heroRest)), { y: 16, opacity: 0 });
+      preloaderDone.then(function () {
+        gsap.timeline({ defaults: { ease: 'power3.out' } })
+          .to(heroEyebrow, { y: 0, opacity: 1, duration: 0.6 })
+          .to(heroInner, { yPercent: 0, duration: 0.95, stagger: 0.09 }, '-=0.35')
+          .to(heroRest, { y: 0, opacity: 1, duration: 0.6, stagger: 0.1 }, '-=0.55');
+      });
+    }
+
+    // G2 · capability tiles open from the bottom, image settles from a slight zoom
+    var tiles = gsap.utils.toArray('.tile');
+    if (tiles.length && !calm) {
+      var revealTile = function (tile, delay, instant) {
+        if (tile.dataset.revealed) return; tile.dataset.revealed = '1';
+        var media = tile.querySelector('.tile-media'), body = tile.querySelector('.tile-body');
+        if (instant) { tile.classList.remove('is-clipping'); gsap.set([media, body], { clearProps: 'all' }); return; }
+        gsap.timeline({ delay: delay, onComplete: function () { tile.classList.remove('is-clipping'); } })
+          .to(tile, { '--rv-t': '0%', duration: 1, ease: 'power3.inOut' }, 0)
+          .to(media, { scale: 1, duration: 1.4, ease: 'power2.out' }, 0)
+          .to(body, { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out' }, 0.5);
+      };
+      tiles.forEach(function (t) { t.classList.add('is-clipping'); });
+      gsap.set(tiles, { '--rv-t': '100%' });
+      gsap.set('.tile-media', { scale: 1.12 });
+      gsap.set('.tile-body', { y: 20, opacity: 0 });
+      ScrollTrigger.batch(tiles, { start: 'top 85%', once: true,
+        onEnter: function (batch) { batch.forEach(function (t, j) { revealTile(t, j * 0.1, false); }); } });
+      ScrollTrigger.addEventListener('refreshInit', function () {
+        tiles.forEach(function (t) { if (!t.dataset.revealed && t.getBoundingClientRect().bottom < 0) revealTile(t, 0, true); });
+      });
+    }
+
+    // G13 · batch reveal for grids (project cards)
     gsap.set('.batch-card', { y: 24, opacity: 0 });
     ScrollTrigger.batch('.batch-card', {
       start: 'top 88%', once: true,
@@ -264,6 +315,54 @@
         { y: function () { return (1 - parseFloat(el.dataset.speed)) * 240; }, ease: 'none',
           scrollTrigger: { trigger: sec, start: 'top bottom', end: 'bottom top', scrub: true } });
     });
+  });
+
+  // G5 · pillars: the sticky image follows the pillar being read, a hairline fills alongside (desktop/tablet only)
+  gsap.matchMedia().add('(min-width: 768px) and (prefers-reduced-motion: no-preference)', function () {
+    var sec = document.getElementById('pillars');
+    var imgs = gsap.utils.toArray('.pillar-img'), items = gsap.utils.toArray('.pillar');
+    if (!sec || imgs.length < 2 || html.classList.contains('a11y-still')) return;
+    sec.classList.add('pillars--live');
+    var current = 0;
+    items[0].classList.add('is-current');
+    var show = function (i) {
+      if (i === current) return;
+      var prev = imgs[current]; current = i;
+      items.forEach(function (p, k) { p.classList.toggle('is-current', k === i); });
+      gsap.set(imgs, { zIndex: 0 }); gsap.set(prev, { zIndex: 1 });
+      gsap.fromTo(imgs[i], { opacity: 0, scale: 1.05, zIndex: 2 }, { opacity: 1, scale: 1, duration: 0.8, ease: 'power2.out', overwrite: true });
+      gsap.to(prev, { opacity: 0, duration: 0.5, delay: 0.3, ease: 'power1.out', overwrite: true });
+    };
+    items.forEach(function (item, i) {
+      ScrollTrigger.create({ trigger: item, start: 'top 60%', end: 'bottom 60%',
+        onToggle: function (self) { if (self.isActive) show(i); } });
+    });
+    gsap.fromTo('.pillars-fill', { scaleY: 0 }, { scaleY: 1, ease: 'none',
+      scrollTrigger: { trigger: '.pillars-list', start: 'top 60%', end: 'bottom 60%', scrub: true } });
+    return function () {
+      sec.classList.remove('pillars--live');
+      items.forEach(function (p) { p.classList.remove('is-current'); });
+      gsap.set(imgs, { clearProps: 'all' });
+    };
+  });
+
+  // G18-lite · closer: the photo opens from a rounded card to full bleed, the line rises over it (no pin)
+  gsap.matchMedia().add({ desk: '(min-width: 768px)', mob: '(max-width: 767px)', ok: '(prefers-reduced-motion: no-preference)' }, function (ctx) {
+    if (!ctx.conditions.ok || html.classList.contains('a11y-still')) return;
+    var stage = document.querySelector('.closer-stage');
+    var title = document.querySelector('.closer-title');
+    var btn = document.querySelector('.closer-inner .btn');
+    if (!stage || !title) return;
+    var words = splitWords(title);
+    var from = ctx.conditions.desk ? { '--c-y': '14%', '--c-x': '16%', '--c-r': '28px' } : { '--c-y': '7%', '--c-x': '5%', '--c-r': '20px' };
+    gsap.set(stage, from);
+    gsap.set(words, { y: 40, opacity: 0 });
+    gsap.set(btn, { y: 20, opacity: 0 });
+    gsap.timeline({ scrollTrigger: { trigger: '#closer', start: 'top 85%', end: 'top 35%', scrub: 1 } })
+      .to(stage, { '--c-y': '0%', '--c-x': '0%', '--c-r': '0px', ease: 'none', duration: 1 }, 0)
+      .to(words, { y: 0, opacity: 1, stagger: 0.08, duration: 0.3, ease: 'power2.out' }, 0.5)
+      .to(btn, { y: 0, opacity: 1, duration: 0.25, ease: 'power2.out' }, 0.75);
+    return function () { gsap.set(stage, { '--c-y': '0%', '--c-x': '0%', '--c-r': '0px' }); gsap.set([btn].concat(words), { clearProps: 'all' }); };
   });
 
   window.addEventListener('load', function () { ScrollTrigger.refresh(); });

@@ -9,7 +9,7 @@
 <link rel="icon" href="logos/favicon.png" type="image/png">
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
 <link href="https://api.fontshare.com/v2/css?f[]=clash-grotesk@400,500&f[]=clash-display@500,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=19">
+<link rel="stylesheet" href="styles.css?v=22">
 </head>
 <body>
 
@@ -154,8 +154,8 @@
   <section class="caps" id="capabilities" aria-label="Capabilities">
     <div class="container">
       <div class="bento">
-        <a class="tile tile--hero batch-card" href="storage.html">
-          <img class="tile-img" src="images/photo-042.jpg" alt="Battery energy storage racks inside a BESS container" loading="lazy" width="1600" height="1412">
+        <a class="tile tile--hero" href="storage.html">
+          <div class="tile-media"><img class="tile-img" src="images/photo-042.jpg" alt="Battery energy storage racks inside a BESS container" loading="lazy" width="1600" height="1412"></div>
           <div class="tile-scrim" aria-hidden="true"></div>
           <div class="tile-body">
             <h3 class="tile-title">ESS</h3>
@@ -163,8 +163,8 @@
             <span class="tile-arrow" aria-hidden="true">&#8599;</span>
           </div>
         </a>
-        <a class="tile batch-card" href="high-voltage.html">
-          <img class="tile-img" src="images/photo-041.jpg" alt="Aerial view of a high-voltage substation under construction" loading="lazy" width="1600" height="1412">
+        <a class="tile" href="high-voltage.html">
+          <div class="tile-media"><img class="tile-img" src="images/photo-041.jpg" alt="Aerial view of a high-voltage substation under construction" loading="lazy" width="1600" height="1412"></div>
           <div class="tile-scrim" aria-hidden="true"></div>
           <div class="tile-body">
             <h3 class="tile-title">High Voltage</h3>
@@ -172,8 +172,8 @@
             <span class="tile-arrow" aria-hidden="true">&#8599;</span>
           </div>
         </a>
-        <a class="tile batch-card" href="pv-sites.html">
-          <img class="tile-img" src="images/photo-007.jpg" alt="Ground-mounted solar PV field" loading="lazy" width="1600" height="1412">
+        <a class="tile" href="pv-sites.html">
+          <div class="tile-media"><img class="tile-img" src="images/photo-007.jpg" alt="Ground-mounted solar PV field" loading="lazy" width="1600" height="1412"></div>
           <div class="tile-scrim" aria-hidden="true"></div>
           <div class="tile-body">
             <h3 class="tile-title">PV Sites</h3>
@@ -181,8 +181,8 @@
             <span class="tile-arrow" aria-hidden="true">&#8599;</span>
           </div>
         </a>
-        <a class="tile tile--wide batch-card" href="om.html">
-          <img class="tile-img" src="images/photo-005.jpg" alt="El-Mor technician inspecting solar panels with a tablet" loading="lazy" width="1600" height="1412">
+        <a class="tile tile--wide" href="om.html">
+          <div class="tile-media"><img class="tile-img" src="images/photo-005.jpg" alt="El-Mor technician inspecting solar panels with a tablet" loading="lazy" width="1600" height="1412"></div>
           <div class="tile-scrim" aria-hidden="true"></div>
           <div class="tile-body">
             <h3 class="tile-title">O&amp;M</h3>
@@ -237,9 +237,14 @@
     <div class="container pillars-grid">
       <div class="pillars-sticky">
         <figure class="pillars-figure reveal">
-          <img src="images/photo-012.jpg" alt="Solar field at sunset with wind turbines on the horizon" loading="lazy" width="1600" height="900">
+          <img class="pillar-img is-active" data-pillar="0" src="images/photo-012.jpg" alt="Solar field at sunset with wind turbines on the horizon" loading="lazy" width="1600" height="900">
+          <img class="pillar-img" data-pillar="1" src="images/photo-040.jpg" alt="Aerial view of a high-voltage substation next to a solar field" loading="lazy" width="1600" height="900">
+          <img class="pillar-img" data-pillar="2" src="images/project-ramat-beka.jpg" alt="Storage containers and equipment laid out at the Ramat Bekka site" loading="lazy" width="1280" height="720">
+          <img class="pillar-img" data-pillar="3" src="images/photo-019.jpg" alt="El-Mor technicians monitoring solar panels with a laptop" loading="lazy" width="1600" height="900">
         </figure>
       </div>
+      <div class="pillars-col">
+      <span class="pillars-track" aria-hidden="true"><span class="pillars-fill"></span></span>
       <ol class="pillars-list">
         <li class="pillar reveal">
           <span class="pillar-index">01</span>
@@ -262,6 +267,7 @@
           <p class="pillar-text">Operations and Maintenance (O&amp;M) services: Monitoring and tracking, anaiysis system cleaning, preventive maintenance, troubleshooting, and repairs.</p>
         </li>
       </ol>
+      </div>
     </div>
   </section>
 
@@ -314,11 +320,13 @@
 
   <!-- 7 · CLOSER (S14ב, melts into footer) -->
   <section class="closer" id="closer" aria-labelledby="closerTitle">
-    <div class="closer-media" data-speed="0.9" aria-hidden="true">
-      <img src="images/photo-018.jpg" alt="" loading="lazy" width="1600" height="900">
+    <div class="closer-stage" aria-hidden="true">
+      <div class="closer-media" data-speed="0.9">
+        <img src="images/photo-018.jpg" alt="" loading="lazy" width="1600" height="900">
+      </div>
     </div>
     <div class="container closer-inner">
-      <h2 class="closer-title gsap-words" id="closerTitle">Energizing Tomorrow</h2>
+      <h2 class="closer-title" id="closerTitle">Energizing Tomorrow</h2>
       <a class="btn btn-light btn-lg" href="contact-us.html">Contact Us</a>
     </div>
   </section>
@@ -420,6 +428,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
-<script src="main.js?v=6"></script>
+<script src="main.js?v=8"></script>
 </body>
 </html>

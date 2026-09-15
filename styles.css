@@ -270,7 +270,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   transition: box-shadow .3s var(--ease), transform .4s var(--ease); }
 .tile--hero { grid-column: span 2; grid-row: span 2; }
 .tile--wide { grid-column: span 2; }
-.tile-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; transition: transform .6s var(--ease); }
+.tile-media { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+.tile-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .6s var(--ease); }
 .tile-scrim { position: absolute; inset: 0; z-index: 1; background: linear-gradient(to top, rgba(4,40,26,.88) 0%, rgba(4,40,26,.35) 45%, rgba(4,40,26,0) 75%); }
 .tile-body { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: var(--pad-card); }
 .tile-title { font-size: var(--fs-h3); line-height: 1.19; color: #fff; }
@@ -334,7 +335,11 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .pillars-grid { display: grid; grid-template-columns: 52% 1fr; gap: var(--gap-l); align-items: start; }
 .pillars-sticky { position: sticky; top: calc(var(--header-h) + clamp(24px, 2.5vw, 56px)); }
 .pillars-figure { margin: 0; border-radius: var(--r-card); overflow: hidden; aspect-ratio: 4 / 5; background: var(--border); }
-.pillars-figure img { width: 100%; height: 100%; object-fit: cover; object-position: 60% center; }
+.pillars-figure { position: relative; }
+.pillars-figure img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 60% center; opacity: 0; }
+.pillars-figure img.is-active { opacity: 1; }
+.pillars-col { position: relative; }
+.pillars-track { display: none; }
 .pillars-list { display: flex; flex-direction: column; }
 .pillar { position: relative; padding: var(--pillar-pad) 0 var(--pillar-pad) clamp(52px, 5vw, 104px); border-top: 1px solid var(--border); }
 .pillar:last-child { border-bottom: 1px solid var(--border); }
@@ -368,9 +373,10 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 
 /* ---------- closer (S14ב) ---------- */
 .closer { position: relative; isolation: isolate; overflow: hidden; color: #fff; padding-block: var(--sec-breath) clamp(88px, 12vw, 240px); text-align: center; }
-.closer-media { position: absolute; inset: -12% 0; z-index: -2; }
+.closer-stage { position: absolute; inset: 0; z-index: -1; overflow: hidden; }
+.closer-media { position: absolute; inset: -12% 0; }
 .closer-media img { width: 100%; height: 100%; object-fit: cover; object-position: center 40%; }
-.closer::after { content: ""; position: absolute; inset: 0; z-index: -1;
+.closer-stage::after { content: ""; position: absolute; inset: 0;
   background: linear-gradient(to top, var(--green-deep) 0%, rgba(6,58,33,.86) 34%, rgba(6,58,33,.45) 70%, rgba(6,58,33,.25) 100%); }
 .closer-inner { display: flex; flex-direction: column; align-items: center; gap: clamp(28px, 2.6vw, 56px); }
 .closer-title { font-size: var(--fs-h1); line-height: 1.02; letter-spacing: -.01em; color: #fff; max-width: 22ch; margin-inline: auto; }
@@ -446,7 +452,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 /* a11y modes */
 html.a11y-contrast, html.a11y-contrast body, html.a11y-contrast .site-header, html.a11y-contrast .site-footer, html.a11y-contrast .projects, html.a11y-contrast .closer, html.a11y-contrast .tile, html.a11y-contrast .a11y-panel, html.a11y-contrast .nav-sub, html.a11y-contrast .mobile-menu-panel { background: #000 !important; color: #ffff00 !important; }
 html.a11y-contrast * { color: #ffff00 !important; border-color: #ffff00 !important; }
-html.a11y-contrast .hero-scrim, html.a11y-contrast .tile-scrim, html.a11y-contrast .closer::after { background: rgba(0,0,0,.85) !important; }
+html.a11y-contrast .hero-scrim, html.a11y-contrast .tile-scrim, html.a11y-contrast .closer-stage::after { background: rgba(0,0,0,.85) !important; }
 html.a11y-contrast .btn, html.a11y-contrast .a11y-btn { background: #ffff00 !important; color: #000 !important; }
 html.a11y-contrast .btn * { color: #000 !important; }
 html.a11y-invert { filter: invert(1) hue-rotate(180deg); }
@@ -531,3 +537,18 @@ html.qa { scroll-behavior: auto; }
 body { word-spacing: 0.06em; }
 h1, h2, h3, .stat-num, .proj-name, .tile-title, .pillar-title, .closer-title, .hero-title { word-spacing: normal; }
 .scroll-cue { min-height: 48px; }
+
+/* ---------- GSAP moves round 2 (15.9.2026): closer opens, pillars sync, hero words, tile reveal ---------- */
+.hero-title .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .1em; margin-bottom: -.1em; }
+.hero-title .wi { display: inline-block; will-change: transform; }
+.closer-title .w { display: inline-block; white-space: pre; }
+@media (min-width: 768px) {
+  .pillars--live .pillars-track { display: block; position: absolute; top: 0; bottom: 0; left: calc(var(--gap-l) / -2); width: 1px; background: var(--border); z-index: 0; }
+  .pillars-fill { position: absolute; inset: 0; background: var(--accent); transform-origin: top center; transform: scaleY(0); }
+  .pillar-index::after { transform-origin: left center; transition: transform .4s var(--ease), opacity .4s var(--ease); }
+  .pillars--live .pillar.is-current .pillar-index::after { transform: scaleX(1.8); opacity: 1; }
+}
+/* clip reveals run on numeric custom properties: tweening the inset() string breaks because the browser
+   shortens symmetric insets to two values and GSAP then pairs the wrong numbers */
+.tile.is-clipping { clip-path: inset(var(--rv-t, 0%) 0% 0% 0% round var(--r-card)); }
+.closer-stage { clip-path: inset(var(--c-y, 0%) var(--c-x, 0%) 0% var(--c-x, 0%) round var(--c-r, 0px) var(--c-r, 0px) 0px 0px); }
