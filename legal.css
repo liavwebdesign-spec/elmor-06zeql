@@ -1,7 +1,7 @@
 /* legal / inner document pages */
 .site-header.is-static { position: sticky; }
-.legal-main { padding-top: 64px; }
-.legal-body { max-width: calc(760px + var(--gutter) * 2); padding-block: 72px 96px; }
+.legal-main { padding-top: var(--header-h); }
+.legal-body { max-width: calc(820px + var(--gutter) * 2); margin-inline: auto; padding-block: var(--sec) clamp(96px, 9vw, 180px); }
 .legal-title { font-size: var(--fs-h1); line-height: 1.02; letter-spacing: -.01em; margin-top: 16px; }
 .legal-body .lead { font-size: var(--fs-lead); line-height: 1.6; color: var(--muted); margin-top: 16px; }
 .legal-body h2 { font-size: var(--fs-h3); line-height: 1.19; margin-top: 40px; }
@@ -14,6 +14,6 @@
 .legal-updated { margin-top: 40px; font-size: var(--fs-micro); color: var(--muted); }
 .footer-bottom--only { margin-top: 0; padding-top: 0; border-top: 0; }
 .legal-page .site-footer { padding-block: 32px; }
-.notfound { padding-block: 120px 140px; }
+.notfound { padding-block: var(--sec-breath) clamp(120px, 12vw, 220px); }
 .notfound .btn { margin-top: 32px; }
 .notfound .btn { color: #fff; text-decoration: none; }

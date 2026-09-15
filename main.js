@@ -90,14 +90,15 @@
     document.querySelectorAll('.corridor-btn').forEach(function (b) {
       b.addEventListener('click', function () {
         var card = corridor.querySelector('.proj-card');
-        var stepX = card ? card.getBoundingClientRect().width + 24 : 380;
+        var gap = parseFloat(getComputedStyle(corridor.querySelector('.corridor-track')).columnGap) || 24;
+        var stepX = card ? card.getBoundingClientRect().width + gap : 380;
         corridor.scrollBy({ left: stepX * parseInt(b.dataset.dir, 10), behavior: still() ? 'auto' : 'smooth' });
       });
     });
     corridor.addEventListener('keydown', function (e) {
       if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
         e.preventDefault();
-        corridor.scrollBy({ left: (e.key === 'ArrowRight' ? 1 : -1) * 384, behavior: still() ? 'auto' : 'smooth' });
+        corridor.scrollBy({ left: (e.key === 'ArrowRight' ? 1 : -1) * (corridor.querySelector('.proj-card').getBoundingClientRect().width + 24), behavior: still() ? 'auto' : 'smooth' });
       }
     });
   }
