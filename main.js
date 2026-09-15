@@ -109,8 +109,7 @@
   }
 
   /* ---------- contact form (static sketch: no backend yet) ---------- */
-  var form = document.getElementById('contactForm');
-  if (form) {
+  document.querySelectorAll('form.contact-form').forEach(function (form) {
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       var ok = true;
@@ -119,14 +118,15 @@
         f.classList.toggle('is-error', bad);
         if (bad) ok = false;
       });
-      var err = document.getElementById('formError');
+      var err = form.querySelector('.form-error');
       if (!ok) { err.hidden = false; err.textContent = 'Please fill in all required fields.'; return; }
-      err.hidden = true;
       // Backend is wired in the Lovable stage; until then the sketch shows the failure path, never a fake success.
       err.hidden = false;
-      err.innerHTML = 'The form is not connected yet. Please call <a href="tel:+97247368770">074-7368770</a>.';
+      err.textContent = 'The form is not connected yet. Please call ';
+      var tel = document.createElement('a'); tel.href = 'tel:+97247368770'; tel.textContent = '074-7368770';
+      err.appendChild(tel); err.appendChild(document.createTextNode('.'));
     });
-  }
+  });
 
   /* ---------- accessibility widget (B19) ---------- */
   (function a11y() {
@@ -240,7 +240,7 @@
     var calm = html.classList.contains('a11y-still');
 
     // G4א · hero title: words rise out of a mask once the preloader is gone
-    var heroTitle = document.querySelector('.hero-title');
+    var heroTitle = document.querySelector('.hero-title, .page-title');
     if (heroTitle && !calm && !heroTitle.querySelector('.wi')) {
       var heroText = heroTitle.textContent.trim();
       var heroWords = heroText.split(/\s+/);
@@ -253,10 +253,10 @@
         if (i < heroWords.length - 1) heroTitle.appendChild(document.createTextNode(' '));
         return inner;
       });
-      var heroEyebrow = document.querySelector('.hero-inner .eyebrow');
+      var heroEyebrow = document.querySelector('.hero-inner .eyebrow, .page-hero .crumbs');
       var heroRest = document.querySelectorAll('.hero-lead, .scroll-cue');
       gsap.set(heroInner, { yPercent: 115 });
-      gsap.set([heroEyebrow].concat(Array.prototype.slice.call(heroRest)), { y: 16, opacity: 0 });
+      gsap.set([heroEyebrow].concat(Array.prototype.slice.call(heroRest)).filter(Boolean), { y: 16, opacity: 0 });
       preloaderDone.then(function () {
         gsap.timeline({ defaults: { ease: 'power3.out' } })
           .to(heroEyebrow, { y: 0, opacity: 1, duration: 0.6 })
@@ -285,6 +285,28 @@
         onEnter: function (batch) { batch.forEach(function (t, j) { revealTile(t, j * 0.1, false); }); } });
       ScrollTrigger.addEventListener('refreshInit', function () {
         tiles.forEach(function (t) { if (!t.dataset.revealed && t.getBoundingClientRect().bottom < 0) revealTile(t, 0, true); });
+      });
+    }
+
+    // G2 · inner-page figures open from the bottom as they scroll in (same vocabulary as the home tiles)
+    var figs = gsap.utils.toArray('.media-reveal');
+    if (figs.length && !calm) {
+      var openFig = function (fig, instant) {
+        if (fig.dataset.revealed) return; fig.dataset.revealed = '1';
+        var img = fig.querySelector('img');
+        if (instant) { fig.classList.remove('is-clipping'); gsap.set(img, { clearProps: 'all' }); return; }
+        gsap.timeline({ onComplete: function () { fig.classList.remove('is-clipping'); } })
+          .to(fig, { '--rv-t': '0%', duration: 1.05, ease: 'power3.inOut' }, 0)
+          .to(img, { scale: 1, duration: 1.5, ease: 'power2.out' }, 0);
+      };
+      figs.forEach(function (f) { f.classList.add('is-clipping'); });
+      gsap.set(figs, { '--rv-t': '100%' });
+      gsap.set(figs.map(function (f) { return f.querySelector('img'); }).filter(Boolean), { scale: 1.1 });
+      figs.forEach(function (f) {
+        ScrollTrigger.create({ trigger: f, start: 'top 85%', once: true, onEnter: function () { openFig(f, false); } });
+      });
+      ScrollTrigger.addEventListener('refreshInit', function () {
+        figs.forEach(function (f) { if (!f.dataset.revealed && f.getBoundingClientRect().bottom < 0) openFig(f, true); });
       });
     }
 
